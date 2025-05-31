@@ -23,7 +23,7 @@ This is the **Spring Boot backend** for the SmartAvaas Resident Community Manage
 
 ### Clone and Setup
 ```bash
-git clone https://github.com/<your-org>/smartavaas-backend.git
+git clone https://github.com/residentportal/smartavaas-backend.git
 cd smartavaas-backend
 mvn clean install
-mvn sprin-boot:run
+mvn spring-boot:run
