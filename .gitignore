@@ -35,4 +35,3 @@ build/
 
 # Prevent secret leaks
 .env
-src/main/resources/application.properties
