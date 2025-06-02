@@ -27,8 +27,8 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public boolean authenticateUser(String mobile, String rawPassword) {
-        return userRepository.findByMobile(mobile)
+    public boolean authenticateUser(String email, String rawPassword) {
+        return userRepository.findByEmail(email)
                 .map(user -> passwordEncoder.matches(rawPassword, user.getPassword()))
                 .orElse(false);
     }
