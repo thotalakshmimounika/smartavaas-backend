@@ -37,14 +37,14 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> loginData) {
-        String mobile = loginData.get("mobile");
+        String email = loginData.get("email");
         String password = loginData.get("password");
 
-        System.out.println("LOGIN ATTEMPT: " + mobile + " / " + password);
+        System.out.println("LOGIN ATTEMPT: " + email + " / " + password);
 
-        boolean isValid = userService.authenticateUser(mobile, password);
+        boolean isValid = userService.authenticateUser(email, password);
         if (isValid) {
-            User user = userRepository.findByMobileOrEmail(mobile, mobile)
+            User user = userRepository.findByMobileOrEmail(email, email)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
             String token = jwtUtil.generateToken(user);
