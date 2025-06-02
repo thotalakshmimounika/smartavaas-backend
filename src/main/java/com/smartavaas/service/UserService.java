@@ -4,10 +4,13 @@ package com.smartavaas.service;
 import com.smartavaas.model.User;
 import com.smartavaas.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -22,9 +25,18 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public User registerUser(User user) {
+    public ResponseEntity<?> registerUser(User user) {
+        if (userRepository.existsByEmail(user.getEmail())) {
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body(Map.of("status", "fail", "message", "Email already exists"));
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+        userRepository.save(user);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(Map.of("status", "success", "message", "User registered successfully"));
+
     }
 
     public boolean authenticateUser(String email, String rawPassword) {

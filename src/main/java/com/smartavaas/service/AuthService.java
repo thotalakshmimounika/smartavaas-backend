@@ -6,6 +6,8 @@ import com.smartavaas.repository.RoleRepository;
 import com.smartavaas.repository.UserRepository;
 import com.smartavaas.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,6 +40,12 @@ public class AuthService {
     //  Register with default role
 
     public void register(RegisterRequest request) {
+//        if (userRepository.existsByEmail(request.getEmail())) {
+//            return ResponseEntity
+//                    .status(HttpStatus.CONFLICT)
+//                    .body(Map.of("status", "fail", "message", "Email already exists"));
+//        }
+
         User user = new User();
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
