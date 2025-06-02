@@ -42,7 +42,9 @@ public class SecurityConfig {
                                 "/auth/**",
                                 "/users/register",
                                 "/test/all",
-                                "/api/payment/callback"
+                                "/api/payment/callback",
+                                "/api/getAnnouncement",
+                                "/api/createAnnouncement"
                         ).permitAll()
                         .requestMatchers("/api/payment/create-link/**").authenticated()
                         .anyRequest().authenticated()
