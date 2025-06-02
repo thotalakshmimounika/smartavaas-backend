@@ -1,6 +1,7 @@
 package com.smartavaas.controller;
 
 import com.smartavaas.model.User;
+import com.smartavaas.repository.UserRepository;
 import com.smartavaas.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,13 +16,12 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    private UserRepository userRepository;
+
     @PostMapping("/register")
-    public ResponseEntity<User> registerUser (@RequestBody User user) {
-        System.out.println("MOBILE: " + user.getMobile());
-        System.out.println("EMAIL: " + user.getEmail());
-        System.out.println("PASSWORD: " + user.getPassword());
-        User registeredUser  = userService.registerUser (user);
-        return ResponseEntity.ok(registeredUser );
+    public ResponseEntity<?> registerUser (@RequestBody User user) {
+        System.out.println(" EMAIL: " + user.getEmail());
+        return userService.registerUser(user);
     }
 
     // Role-Guarded Endpoint
@@ -31,15 +31,6 @@ public class UserController {
         return ResponseEntity.ok(userService.getUsers());
     }
 
-//    @PostMapping("/login")
-//    public ResponseEntity<String> login(@RequestParam String mobile, @RequestParam String password) {
-//        boolean success = userService.authenticateUser(mobile, password);
-//        if (success) {
-//            return ResponseEntity.ok("Login successful.");
-//        } else {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials.");
-//        }
-//    }
 }
 
 
