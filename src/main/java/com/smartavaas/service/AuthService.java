@@ -80,6 +80,6 @@ public class AuthService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         // Generate JWT after successful OTP verification
-        return jwtUtil.generateToken(user);
+        return jwtUtil.generateToken(user.getEmail());
     }
 }
