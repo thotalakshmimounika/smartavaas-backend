@@ -16,8 +16,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    private UserRepository userRepository;
-
     @PostMapping("/register")
     public ResponseEntity<?> registerUser (@RequestBody User user) {
         System.out.println(" EMAIL: " + user.getEmail());
