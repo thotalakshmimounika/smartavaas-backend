@@ -1,6 +1,7 @@
 package com.smartavaas.controller;
 
 import com.smartavaas.dto.BaseApiResponse;
+import com.smartavaas.dto.CheckEmailRequest;
 import com.smartavaas.dto.OtpRequest;
 import com.smartavaas.model.User;
 import com.smartavaas.repository.UserRepository;
@@ -134,5 +135,21 @@ public class AuthController {
                             .build());
         }
     }
+
+    @PostMapping("/check-email")
+    public ResponseEntity<BaseApiResponse<Boolean>> checkEmailExists(@RequestBody CheckEmailRequest request) {
+        boolean exists = userRepository.existsByEmail(request.getEmail());
+
+        BaseApiResponse<Boolean> response = BaseApiResponse.<Boolean>builder()
+                .timestamp(LocalDateTime.now())
+                .statusCode(exists ? HttpStatus.OK.value() : HttpStatus.NOT_FOUND.value())
+                .status(exists ? "success" : "fail")
+                .message(exists ? "Email exists" : "Email not found")
+                .data(exists)
+                .build();
+
+        return new ResponseEntity<>(response, exists ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    }
+
 
 }
