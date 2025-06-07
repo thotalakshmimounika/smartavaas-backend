@@ -100,7 +100,7 @@ public class AuthController {
                         .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
                 Map<String, Object> responseData = Map.of(
-                        "jwt", jwtUtil.generateToken(email),
+                        "token", jwtUtil.generateToken(email),
                         "email", email,
                         "fullname", user.getFirstname() + " " + user.getLastname(),
                         "userId", user.getId(),
