@@ -1,7 +1,6 @@
 package com.smartavaas.controller;
 
 import com.smartavaas.dto.BaseApiResponse;
-import com.smartavaas.dto.CheckEmailRequest;
 import com.smartavaas.dto.OtpRequest;
 import com.smartavaas.model.User;
 import com.smartavaas.repository.UserRepository;
@@ -89,23 +88,34 @@ public class AuthController {
     }
 
     @PostMapping("/verify-otp")
-    public ResponseEntity<BaseApiResponse<Map<String, String>>> verifyOtp(@RequestBody OtpRequest request) {
+    public ResponseEntity<BaseApiResponse<Map<String, Object>>> verifyOtp(@RequestBody OtpRequest request) {
         String email = request.getEmail();
         String otp = request.getOtp();
 
         try {
             boolean isValid = otpService.verifyOtp(email, otp);
             if (isValid) {
-                return ResponseEntity.ok(BaseApiResponse.<Map<String, String>>builder()
+                User user = userRepository.findByEmail(email)
+                        .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+
+                Map<String, Object> responseData = Map.of(
+                        "jwt", jwtUtil.generateToken(email),
+                        "email", email,
+                        "fullname", user.getFirstname() + " " + user.getLastname(),
+                        "userId", user.getId(),
+                        "role", user.getRoles()
+                );
+
+                return ResponseEntity.ok(BaseApiResponse.<Map<String, Object>>builder()
                         .timestamp(LocalDateTime.now())
                         .statusCode(200)
                         .status("success")
                         .message("OTP verified successfully")
-                        .data(Map.of("jwt", jwtUtil.generateToken(email), "email", email))
+                        .data(responseData)
                         .build());
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                        BaseApiResponse.<Map<String, String>>builder()
+                        BaseApiResponse.<Map<String, Object>>builder()
                                 .timestamp(LocalDateTime.now())
                                 .statusCode(401)
                                 .status("fail")
@@ -115,7 +125,7 @@ public class AuthController {
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                    BaseApiResponse.<Map<String, String>>builder()
+                    BaseApiResponse.<Map<String, Object>>builder()
                             .timestamp(LocalDateTime.now())
                             .statusCode(500)
                             .status("error")
@@ -124,21 +134,5 @@ public class AuthController {
                             .build());
         }
     }
-
-    @PostMapping("/check-email")
-    public ResponseEntity<BaseApiResponse<Boolean>> checkEmailExists(@RequestBody CheckEmailRequest request) {
-        boolean exists = userRepository.existsByEmail(request.getEmail());
-
-        BaseApiResponse<Boolean> response = BaseApiResponse.<Boolean>builder()
-                .timestamp(LocalDateTime.now())
-                .statusCode(exists ? HttpStatus.OK.value() : HttpStatus.NOT_FOUND.value())
-                .status(exists ? "success" : "fail")
-                .message(exists ? "Email exists" : "Email not found")
-                .data(exists)
-                .build();
-
-        return new ResponseEntity<>(response, exists ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-    }
-
 
 }
