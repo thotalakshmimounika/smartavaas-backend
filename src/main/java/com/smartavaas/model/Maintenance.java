@@ -7,6 +7,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,7 +26,9 @@ public class Maintenance {
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private String status;
-    private long userId;
+    @ManyToOne
+    @JoinColumn(name = "userId", nullable = false)
+    private User user;
     public Maintenance() {
 
     }
