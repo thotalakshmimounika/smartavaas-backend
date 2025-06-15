@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -31,32 +30,14 @@ public class MaintenanceController {
     public ResponseEntity<BaseApiResponse<Map<String, Object>>> createRequest(
             @PathVariable long userId,
             @RequestBody MaintenanceRequestDto maintenanceRequestDto) {
-        boolean created = maintenanceService.createRequest(userId, maintenanceRequestDto);
-        if (created) {
-            Map<String, Object> responseData = Map.of(
-                    "message", "Maintenance request created successfully.",
-                    "userId", userId
-            );
-            return ResponseEntity.ok(BaseApiResponse.<Map<String, Object>>builder()
-                    .timestamp(LocalDateTime.now())
-                    .statusCode(200)
-                    .status("success")
-                    .message("Request created successfully")
-                    .data(responseData)
-                    .build());
-        } else {
-            Map<String, Object> errorData = Map.of(
-                    "message", "Failed to create maintenance request. Please try again.",
-                    "userId", userId
-            );
-            return ResponseEntity.status(500).body(BaseApiResponse.<Map<String, Object>>builder()
-                    .timestamp(LocalDateTime.now())
-                    .statusCode(500)
-                    .status("error")
-                    .message("Request creation failed")
-                    .data(errorData)
-                    .build());
-        }
+        Map<String, Object> responseData = maintenanceService.createRequest(userId, maintenanceRequestDto);
+        return ResponseEntity.ok(BaseApiResponse.<Map<String, Object>>builder()
+                .timestamp(LocalDateTime.now())
+                .statusCode(200)
+                .status("success")
+                .message("Request created successfully")
+                .data(responseData)
+                .build());
     }
 
     @GetMapping("/track/{userId}")
@@ -80,32 +61,14 @@ public class MaintenanceController {
             @PathVariable long userId,
             @PathVariable Long requestId,
             @RequestBody MaintenanceRequestDto maintenanceRequestDto) {
-        boolean updated = maintenanceService.updateRequestByUser(userId, requestId, maintenanceRequestDto);
-        if (updated) {
-            Map<String, Object> responseData = Map.of(
-                    "message", "Request updated successfully.",
-                    "requestId", requestId
-            );
-            return ResponseEntity.ok(BaseApiResponse.<Map<String, Object>>builder()
-                    .timestamp(LocalDateTime.now())
-                    .statusCode(200)
-                    .status("success")
-                    .message("Request updated successfully")
-                    .data(responseData)
-                    .build());
-        } else {
-            Map<String, Object> errorData = Map.of(
-                    "message", "Request not found or update failed.",
-                    "requestId", requestId
-            );
-            return ResponseEntity.status(404).body(BaseApiResponse.<Map<String, Object>>builder()
-                    .timestamp(LocalDateTime.now())
-                    .statusCode(404)
-                    .status("error")
-                    .message("Request update failed")
-                    .data(errorData)
-                    .build());
-        }
+        Map<String, Object> responseData = maintenanceService.updateRequestByUser(userId, requestId, maintenanceRequestDto);
+        return ResponseEntity.ok(BaseApiResponse.<Map<String, Object>>builder()
+                .timestamp(LocalDateTime.now())
+                .statusCode(200)
+                .status("success")
+                .message("Request updated successfully")
+                .data(responseData)
+                .build());
     }
 
     @PatchMapping("/admin/update-status/{requestId}")
@@ -145,35 +108,15 @@ public class MaintenanceController {
     public ResponseEntity<BaseApiResponse<Map<String, Object>>> deleteRequest(
             @PathVariable long userId,
             @PathVariable Long requestId) {
-        boolean deleted = maintenanceService.deleteRequest(userId, requestId);
-        if (deleted) {
-            Map<String, Object> responseData = Map.of(
-                    "message", "Request deleted successfully.",
-                    "requestId", requestId
-            );
-            return ResponseEntity.ok(BaseApiResponse.<Map<String, Object>>builder()
-                    .timestamp(LocalDateTime.now())
-                    .statusCode(200)
-                    .status("success")
-                    .message("Request deleted successfully")
-                    .data(responseData)
-                    .build());
-        } else {
-            Map<String, Object> errorData = Map.of(
-                    "message", "Request not found or deletion failed.",
-                    "requestId", requestId
-            );
-            return ResponseEntity.status(404).body(BaseApiResponse.<Map<String, Object>>builder()
-                    .timestamp(LocalDateTime.now())
-                    .statusCode(404)
-                    .status("error")
-                    .message("Request deletion failed")
-                    .data(errorData)
-                    .build());
-        }
+        Map<String, Object> responseData = maintenanceService.deleteRequest(userId, requestId);
+        return ResponseEntity.ok(BaseApiResponse.<Map<String, Object>>builder()
+                .timestamp(LocalDateTime.now())
+                .statusCode(200)
+                .status("success")
+                .message("Request deleted successfully")
+                .data(responseData)
+                .build());
     }
-
-
 
 }
 
