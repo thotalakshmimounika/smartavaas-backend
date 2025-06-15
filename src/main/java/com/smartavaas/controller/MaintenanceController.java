@@ -1,7 +1,6 @@
 package com.smartavaas.controller;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,11 +41,7 @@ public class MaintenanceController {
 
     @GetMapping("/track/{userId}")
     public ResponseEntity<BaseApiResponse<Map<String, Object>>> trackRequests(@PathVariable Long userId) {
-        List<MaintenanceResponseDto> requests = maintenanceService.getRequestsByUserId(userId);
-        Map<String, Object> responseData = Map.of(
-                "userId", userId,
-                "requests", requests
-        );
+        Map<String, Object> responseData = maintenanceService.getRequestsByUserId(userId);
         return ResponseEntity.ok(BaseApiResponse.<Map<String, Object>>builder()
                 .timestamp(LocalDateTime.now())
                 .statusCode(200)
@@ -55,7 +50,6 @@ public class MaintenanceController {
                 .data(responseData)
                 .build());
     }
-
     @PatchMapping("/user/update/{userId}/{requestId}")
     public ResponseEntity<BaseApiResponse<Map<String, Object>>> updateRequestByUser(
             @PathVariable long userId,
