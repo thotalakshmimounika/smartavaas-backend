@@ -1,6 +1,7 @@
 package com.smartavaas.service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -47,25 +48,29 @@ public class MaintenanceService {
         );
     }
 
-    public List<MaintenanceResponseDto> getRequestsByUserId(Long userId) {
+    public Map<String, Object> getRequestsByUserId(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Error in fetching maintenance request for user" + userId + "Invalid userId, User not found"));
+                .orElseThrow(() -> new UserNotFoundException("Error in fetching maintenance request for user " + userId + ". Invalid userId, User not found"));
 
-        List<Maintenance> maintenances = maintenanceRepository.findByUser(user);
-        return maintenances.stream()
+        List<Map<String, Object>> requests = maintenanceRepository.findByUser(user).stream()
                 .map(maintenance -> {
-                    MaintenanceResponseDto responseDto = new MaintenanceResponseDto();
-                    responseDto.setUserid(maintenance.getUser().getId());
-                    responseDto.setTitle(maintenance.getTitle());
-                    responseDto.setDescription(maintenance.getDescription());
-                    responseDto.setCreatedAt(maintenance.getCreatedAt());
-                    responseDto.setModifiedAt(maintenance.getModifiedAt());
-                    responseDto.setStatus(maintenance.getStatus());
-                    return responseDto;
+                    Map<String, Object> requestMap = new HashMap<>();
+                    requestMap.put("requestId", maintenance.getId());
+                    requestMap.put("title", maintenance.getTitle());
+                    requestMap.put("description", maintenance.getDescription());
+                    requestMap.put("createdAt", maintenance.getCreatedAt());
+                    requestMap.put("modifiedAt", maintenance.getModifiedAt());
+                    requestMap.put("status", maintenance.getStatus());
+                    return requestMap;
                 })
                 .toList();
-    }
 
+        Map<String, Object> response = new HashMap<>();
+        response.put("userId", user.getId());
+        response.put("requests", requests);
+
+        return response;
+    }
     public void checkAndSetString(Consumer<String> target, Supplier<String> source) {
         String value = source.get();
         if (value != null && !value.isBlank()) {
