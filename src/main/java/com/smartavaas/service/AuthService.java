@@ -1,6 +1,10 @@
 package com.smartavaas.service;
 
+import com.smartavaas.dto.AuthRequest;
+import com.smartavaas.dto.AuthResponse;
 import com.smartavaas.dto.RegisterRequest;
+import com.smartavaas.exception.InvalidCredentialsException;
+import com.smartavaas.exception.UnauthorizedException;
 import com.smartavaas.model.User;
 import com.smartavaas.repository.RoleRepository;
 import com.smartavaas.repository.UserRepository;
@@ -23,6 +27,9 @@ public class AuthService {
     private UserRepository userRepository;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private JwtUtil jwtUtil;
 
     @Autowired
@@ -31,34 +38,48 @@ public class AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private RoleService roleService;
+//    @Autowired
+//    private RoleService roleService;
     private final Map<String, String> otpStorage = new HashMap<>();
 
-    //user.setRoles(Set.of(userRole));
-
-    //  Register with default role
-
-    public void register(RegisterRequest request) {
-//        if (userRepository.existsByEmail(request.getEmail())) {
-//            return ResponseEntity
-//                    .status(HttpStatus.CONFLICT)
-//                    .body(Map.of("status", "fail", "message", "Email already exists"));
-//        }
-
-        User user = new User();
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-
-        // Assign roles based on request
-        if (request.getRoles() != null && request.getRoles().contains("ROLE_ADMIN")) {
-            user.setRoles(roleService.getAdminRoles());
-        } else {
-            user.setRoles(roleService.getDefaultUserRoles());
+    public AuthResponse login(AuthRequest request) {
+        boolean authenticated = userService.authenticateUser(request.getEmail(), request.getPassword());
+        if (!authenticated) {
+            throw new InvalidCredentialsException("Invalid email or password");
         }
 
-        userRepository.save(user);
+        User user = userRepository.findByMobileOrEmail(request.getEmail(), request.getEmail())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        String token = jwtUtil.generateToken(user.getEmail());
+
+        return new AuthResponse(
+                token,
+                user.getFirstname() + " " + user.getLastname(),
+                user.getRoles().toString(),
+                user.getId()
+        );
     }
+//    public void register(RegisterRequest request) {
+////        if (userRepository.existsByEmail(request.getEmail())) {
+////            return ResponseEntity
+////                    .status(HttpStatus.CONFLICT)
+////                    .body(Map.of("status", "fail", "message", "Email already exists"));
+////        }
+//
+//        User user = new User();
+//        user.setEmail(request.getEmail());
+//        user.setPassword(passwordEncoder.encode(request.getPassword()));
+//
+//        // Assign roles based on request
+//        if (request.getRoles() != null && request.getRoles().contains("ROLE_ADMIN")) {
+//            user.setRoles(roleService.getAdminRoles());
+//        } else {
+//            user.setRoles(roleService.getDefaultUserRoles());
+//        }
+//
+//        userRepository.save(user);
+//    }
 
 
 
