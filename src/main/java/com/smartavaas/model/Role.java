@@ -10,7 +10,6 @@ import lombok.*;
 @AllArgsConstructor
 
 public class Role {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,7 +17,6 @@ public class Role {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, unique = true)
     private RoleType name; // Example: ROLE_RESIDENT, ROLE_ADMIN
-
 
     public Role(RoleType name) {
         this.name = name;

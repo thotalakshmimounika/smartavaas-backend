@@ -1,6 +1,5 @@
 package com.smartavaas.service;
 
-
 import com.smartavaas.dto.RegisterRequest;
 import com.smartavaas.dto.RegisterResponse;
 import com.smartavaas.model.Role;
@@ -16,8 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 @Service

@@ -1,6 +1,5 @@
 package com.smartavaas.model;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 

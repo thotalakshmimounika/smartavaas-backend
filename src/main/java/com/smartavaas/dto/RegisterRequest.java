@@ -24,4 +24,5 @@ public class RegisterRequest {
 
 //    // Optional field - only needed if admin wants to assign custom roles
 //    private Set<String> roles;
+
 }

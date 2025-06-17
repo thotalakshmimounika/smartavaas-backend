@@ -1,17 +1,14 @@
 package com.smartavaas.service;
 
+
 import com.smartavaas.dto.AuthRequest;
 import com.smartavaas.dto.AuthResponse;
-import com.smartavaas.dto.RegisterRequest;
 import com.smartavaas.exception.InvalidCredentialsException;
-import com.smartavaas.exception.UnauthorizedException;
 import com.smartavaas.model.User;
 import com.smartavaas.repository.RoleRepository;
 import com.smartavaas.repository.UserRepository;
 import com.smartavaas.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

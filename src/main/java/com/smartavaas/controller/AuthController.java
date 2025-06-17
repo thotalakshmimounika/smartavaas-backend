@@ -10,6 +10,9 @@ import com.smartavaas.service.AuthService;
 import com.smartavaas.service.OtpService;
 import com.smartavaas.service.UserService;
 import jakarta.validation.Valid;
+import com.smartavaas.dto.BaseApiResponse;
+import com.smartavaas.dto.CheckEmailRequest;
+import com.smartavaas.dto.OtpRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +44,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponseBuilder.failure("Unexpected error", HttpStatus.INTERNAL_SERVER_ERROR));
         }
+
     }
 
     @PostMapping("/send-otp")
@@ -50,7 +54,6 @@ public class AuthController {
         try {
             boolean sent = otpService.sendOtpToEmail(email);
             HttpStatus status = sent ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR;
-
             return ResponseEntity.status(status).body(
                     sent
                             ? ApiResponseBuilder.success("OTP sent successfully", Map.of("email", email))
@@ -81,7 +84,6 @@ public class AuthController {
                         "userId", user.getId(),
                         "role", user.getRoles()
                 );
-
                 return ResponseEntity.ok(ApiResponseBuilder.success("OTP verified successfully", responseData));
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

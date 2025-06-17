@@ -5,7 +5,6 @@ import com.smartavaas.dto.BaseApiResponse;
 import com.smartavaas.dto.RegisterRequest;
 import com.smartavaas.dto.RegisterResponse;
 import com.smartavaas.model.User;
-import com.smartavaas.repository.UserRepository;
 import com.smartavaas.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
