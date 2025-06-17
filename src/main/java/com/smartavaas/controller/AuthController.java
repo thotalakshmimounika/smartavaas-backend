@@ -1,13 +1,18 @@
 package com.smartavaas.controller;
 
-import com.smartavaas.dto.BaseApiResponse;
-import com.smartavaas.dto.CheckEmailRequest;
-import com.smartavaas.dto.OtpRequest;
+import com.smartavaas.common.ApiResponseBuilder;
+import com.smartavaas.dto.*;
+import com.smartavaas.exception.InvalidCredentialsException;
 import com.smartavaas.model.User;
 import com.smartavaas.repository.UserRepository;
 import com.smartavaas.security.JwtUtil;
+import com.smartavaas.service.AuthService;
 import com.smartavaas.service.OtpService;
 import com.smartavaas.service.UserService;
+import jakarta.validation.Valid;
+import com.smartavaas.dto.BaseApiResponse;
+import com.smartavaas.dto.CheckEmailRequest;
+import com.smartavaas.dto.OtpRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,40 +30,21 @@ public class AuthController {
     @Autowired private UserRepository userRepository;
     @Autowired private JwtUtil jwtUtil;
     @Autowired private UserService userService;
+    @Autowired private AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<BaseApiResponse<Map<String, Object>>> login(@RequestBody Map<String, String> loginData) {
-        String email = loginData.get("email");
-        String password = loginData.get("password");
-
-        if (userService.authenticateUser(email, password)) {
-            User user = userRepository.findByMobileOrEmail(email, email)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
-            Map<String, Object> responseData = Map.of(
-                    "token", jwtUtil.generateToken(user.getEmail()),
-                    "fullname", user.getFirstname() + " " + user.getLastname(),
-                    "role", user.getRoles(),
-                    "userId", user.getId()
-            );
-
-            return ResponseEntity.ok(BaseApiResponse.<Map<String, Object>>builder()
-                    .timestamp(LocalDateTime.now())
-                    .statusCode(200)
-                    .status("success")
-                    .message("Login successful")
-                    .data(responseData)
-                    .build());
+    public ResponseEntity<BaseApiResponse<AuthResponse>> login(@RequestBody @Valid AuthRequest request) {
+        try {
+            AuthResponse data = authService.login(request);
+            return ResponseEntity.ok(ApiResponseBuilder.success("Login successful", data));
+        } catch (InvalidCredentialsException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponseBuilder.failure(ex.getMessage(), HttpStatus.UNAUTHORIZED));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponseBuilder.failure("Unexpected error", HttpStatus.INTERNAL_SERVER_ERROR));
         }
 
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                BaseApiResponse.<Map<String, Object>>builder()
-                        .timestamp(LocalDateTime.now())
-                        .statusCode(401)
-                        .status("fail")
-                        .message("Invalid credentials")
-                        .data(null)
-                        .build());
     }
 
     @PostMapping("/send-otp")
@@ -68,23 +54,15 @@ public class AuthController {
         try {
             boolean sent = otpService.sendOtpToEmail(email);
             HttpStatus status = sent ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR;
-
-            return new ResponseEntity<>(BaseApiResponse.<Map<String, String>>builder()
-                    .timestamp(LocalDateTime.now())
-                    .statusCode(status.value())
-                    .status(sent ? "success" : "fail")
-                    .message(sent ? "OTP sent successfully" : "Failed to send OTP")
-                    .data(Map.of("email", email))
-                    .build(), status);
+            return ResponseEntity.status(status).body(
+                    sent
+                            ? ApiResponseBuilder.success("OTP sent successfully", Map.of("email", email))
+                            : ApiResponseBuilder.failure("Failed to send OTP", status)
+            );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                    BaseApiResponse.<Map<String, String>>builder()
-                            .timestamp(LocalDateTime.now())
-                            .statusCode(500)
-                            .status("error")
-                            .message("Unexpected error while sending OTP: " + e.getMessage())
-                            .data(Map.of("email", email))
-                            .build());
+                    ApiResponseBuilder.error("Unexpected error while sending OTP: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, Map.of("email", email))
+            );
         }
     }
 
@@ -106,33 +84,15 @@ public class AuthController {
                         "userId", user.getId(),
                         "role", user.getRoles()
                 );
-
-                return ResponseEntity.ok(BaseApiResponse.<Map<String, Object>>builder()
-                        .timestamp(LocalDateTime.now())
-                        .statusCode(200)
-                        .status("success")
-                        .message("OTP verified successfully")
-                        .data(responseData)
-                        .build());
+                return ResponseEntity.ok(ApiResponseBuilder.success("OTP verified successfully", responseData));
             } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                        BaseApiResponse.<Map<String, Object>>builder()
-                                .timestamp(LocalDateTime.now())
-                                .statusCode(401)
-                                .status("fail")
-                                .message("Invalid OTP")
-                                .data(Map.of("email", email))
-                                .build());
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(ApiResponseBuilder.failure("Invalid OTP", HttpStatus.UNAUTHORIZED));
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                    BaseApiResponse.<Map<String, Object>>builder()
-                            .timestamp(LocalDateTime.now())
-                            .statusCode(500)
-                            .status("error")
-                            .message("Exception during OTP verification: " + e.getMessage())
-                            .data(Map.of("email", email))
-                            .build());
+                    ApiResponseBuilder.error("Exception during OTP verification: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, Map.of("email", email))
+            );
         }
     }
 

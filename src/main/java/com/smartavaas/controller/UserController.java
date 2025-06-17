@@ -1,9 +1,13 @@
 package com.smartavaas.controller;
 
+import com.smartavaas.common.ApiResponseBuilder;
+import com.smartavaas.dto.BaseApiResponse;
+import com.smartavaas.dto.RegisterRequest;
+import com.smartavaas.dto.RegisterResponse;
 import com.smartavaas.model.User;
-import com.smartavaas.repository.UserRepository;
 import com.smartavaas.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -17,9 +21,10 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser (@RequestBody User user) {
-        System.out.println(" EMAIL: " + user.getEmail());
-        return userService.registerUser(user);
+    public ResponseEntity<BaseApiResponse<RegisterResponse>> registerUser(@RequestBody RegisterRequest request) {
+        RegisterResponse response = userService.register(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponseBuilder.created("Registration successful", response));
     }
 
     // Role-Guarded Endpoint

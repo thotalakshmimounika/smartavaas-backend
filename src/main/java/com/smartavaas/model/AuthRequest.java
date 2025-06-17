@@ -1,3 +1,4 @@
+
 package com.smartavaas.model;
 
 import lombok.AllArgsConstructor;
