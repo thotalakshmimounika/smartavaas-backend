@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -32,9 +33,10 @@ public class DocumentCentreService {
     public String uploadDocument(String username, MultipartFile file, String categoryName) throws IOException {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("File is empty");
+
         }
 
-        if (file.getSize() > 5 * 1024 * 1024) { // 5MB max
+        if (file.getSize() > 2 * 1024 * 1024) { // 5MB max
             throw new IllegalArgumentException("File size exceeds limit");
         }
 
@@ -46,7 +48,11 @@ public class DocumentCentreService {
                     return categoryFileRepository.save(newCategory);
                 });
 
-        String fileId = UUID.randomUUID().toString();
+
+        String fileId = LocalDateTime.now()+"_";
+
+        fileId += UUID.randomUUID().toString();
+
         String originalFileName = file.getOriginalFilename();
         String storedFileName = fileId + "_" + originalFileName;
 
