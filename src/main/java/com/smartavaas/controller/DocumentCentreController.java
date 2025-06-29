@@ -6,8 +6,7 @@ import com.smartavaas.dto.BaseApiResponse;
 import com.smartavaas.model.ManageFileDoc;
 import com.smartavaas.repository.ManageFileDocRepository;
 import com.smartavaas.service.DocumentCentreService;
-import java.util.List;
-
+import org.hibernate.mapping.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
@@ -16,8 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import java.util.List;
-
 
 import java.io.File;
 import java.io.IOException;
@@ -108,15 +105,12 @@ public class DocumentCentreController {
     @GetMapping("/myFiles")
     public ResponseEntity<BaseApiResponse<List<ManageFileDoc>>> listUserFiles(Principal principal) {
         String username = principal.getName();
-        List<ManageFileDoc> files = null;
         try {
-            files = manageFileDocRepository.findAllByCreatedBy(username);
+            List<ManageFileDoc> files = manageFileDocRepository.findAllByCreatedBy(username);
             return ResponseEntity.ok(ApiResponseBuilder.success("User files fetched successfully", files));
         } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(ApiResponseBuilder.error("Failed to fetch user files", HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage()));
-            return ResponseEntity.ok(ApiResponseBuilder.<List<ManageFileDoc>>success("User files fetched successfully", files));
-
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponseBuilder.error("Failed to fetch user files", HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage()));
         }
     }
 }
