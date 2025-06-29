@@ -1,3 +1,4 @@
+
 package com.smartavaas.common;
 
 import com.smartavaas.dto.BaseApiResponse;
@@ -47,4 +48,3 @@ public class ApiResponseBuilder {
                 .build();
     }
 }
-

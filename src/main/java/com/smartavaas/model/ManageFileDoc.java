@@ -15,11 +15,15 @@ public class ManageFileDoc {
     private String fileName; // path or original file name
     private String docURL;   // downloadable URL
 
+
+
     @ManyToOne
     @JoinColumn(name = "category_id")
     private CategoryFile category;
 
     private boolean active;
+
+
 
     private String modifiedBy;
 

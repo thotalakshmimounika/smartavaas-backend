@@ -49,7 +49,8 @@ public class DocumentCentreService {
                 });
 
 
-        String fileId = LocalDateTime.now()+"_";
+        String fileId = java.time.format.DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss")
+                .format(LocalDateTime.now());
 
         fileId += UUID.randomUUID().toString();
 
