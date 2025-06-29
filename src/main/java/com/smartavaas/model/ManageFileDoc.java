@@ -1,9 +1,6 @@
 package com.smartavaas.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
@@ -17,6 +14,7 @@ public class ManageFileDoc {
 
 
 
+
     @ManyToOne
     @JoinColumn(name = "category_id")
     private CategoryFile category;
@@ -24,7 +22,7 @@ public class ManageFileDoc {
     private boolean active;
 
 
-
+    private String createdBy;
     private String modifiedBy;
 
     public String getModifiedBy() {
@@ -101,7 +99,7 @@ public class ManageFileDoc {
 
     private LocalDateTime modifiedAt;
 
-    private String createdBy;
+
     private LocalDateTime createdAt;
 }
 

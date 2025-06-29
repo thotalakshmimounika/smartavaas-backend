@@ -6,10 +6,12 @@ import com.smartavaas.dto.BaseApiResponse;
 import com.smartavaas.model.ManageFileDoc;
 import com.smartavaas.repository.ManageFileDocRepository;
 import com.smartavaas.service.DocumentCentreService;
+import org.hibernate.mapping.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,34 +29,88 @@ public class DocumentCentreController {
 
     @Autowired
     private DocumentCentreService documentService;
+
     @Autowired
     private ManageFileDocRepository manageFileDocRepository;
 
-    @PostMapping("/upload")
-    public ResponseEntity<BaseApiResponse<String>> uploadFile(
-            @RequestParam("file") MultipartFile file,
+    // ✅ Upload multiple files (max 10)
+    @PostMapping("/uploadMultiple")
+    public ResponseEntity<BaseApiResponse<String>> uploadMultipleFiles(
+            @RequestParam("files") MultipartFile[] files,
             @RequestParam("category") String category,
-            Principal principal // comes from AuthBeaver or Spring Security
-    ) throws IOException {
+            Principal principal
+    ) {
+        String username = principal.getName();
+
+        if (files.length > 10) {
+            return ResponseEntity.badRequest().body(
+                    ApiResponseBuilder.error("Maximum 10 files allowed", HttpStatus.BAD_REQUEST, null));
+        }
+
+        try {
+            for (MultipartFile file : files) {
+                documentService.uploadDocument(username, file, category);
+            }
+
+            return ResponseEntity.ok(ApiResponseBuilder.success("Files uploaded successfully", "Files uploaded: " + files.length));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ApiResponseBuilder.error("Upload failed", HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage()));
+        }
+    }
+
+    // ✅ Download file by fileId
+    @GetMapping("/download/{fileId}")
+    public ResponseEntity<byte[]> downloadFile(@PathVariable String fileId) {
+        try {
+            ManageFileDoc doc = (ManageFileDoc)manageFileDocRepository.findByFileId(fileId)
+                    .orElseThrow(() -> new RuntimeException("File not found"));
+
+            byte[] fileContent = Files.readAllBytes(Paths.get(doc.getDocURL()));
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + doc.getFileName() + "\"");
+
+            return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .header("X-Error", e.getMessage())
+                    .build();
+        }
+    }
+
+    // ✅ View file inline by fileId (PDF, image, etc.)
+    @GetMapping("/view/{fileId}")
+    public ResponseEntity<byte[]> viewFile(@PathVariable String fileId) {
+        try {
+            ManageFileDoc doc = (ManageFileDoc)manageFileDocRepository.findByFileId(fileId)
+                    .orElseThrow(() -> new RuntimeException("File not found"));
+
+            byte[] fileContent = Files.readAllBytes(Paths.get(doc.getDocURL()));
+            String contentType = Files.probeContentType(Paths.get(doc.getDocURL()));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType(
+                    contentType != null ? contentType : MediaType.APPLICATION_OCTET_STREAM_VALUE));
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + doc.getFileName() + "\"");
+
+            return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .header("X-Error", e.getMessage())
+                    .build();
+        }
+    }
+
+    // ✅ Get all files uploaded by the logged-in user (uses entity directly)
+    @GetMapping("/myFiles")
+    public ResponseEntity<BaseApiResponse<List<ManageFileDoc>>> listUserFiles(Principal principal) {
         String username = principal.getName();
         try {
-            String result = documentService.uploadDocument(username, file, category);
-            return ResponseEntity.ok(ApiResponseBuilder.success("File is uploaded successfully",result));
-
-        }
-        catch(Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    ApiResponseBuilder.error(e.getMessage(), HttpStatus.BAD_REQUEST, "exeception occured in file upload"));
-
+            List<ManageFileDoc> files = manageFileDocRepository.findAllByCreatedBy(username);
+            return ResponseEntity.ok(ApiResponseBuilder.success("User files fetched successfully", files));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponseBuilder.error("Failed to fetch user files", HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage()));
         }
     }
-
-    @GetMapping("/download/{fileId}")
-    public byte[] downloadFile(@PathVariable String fileId) throws IOException {
-        ManageFileDoc doc = (ManageFileDoc) manageFileDocRepository.findByFileId(fileId)
-                .orElseThrow(() -> new RuntimeException("File not found"));
-
-        return Files.readAllBytes(Paths.get(doc.getDocURL()));
-    }
-
 }

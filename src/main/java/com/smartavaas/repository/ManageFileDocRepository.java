@@ -9,6 +9,8 @@ import java.util.Optional;
 
 public interface ManageFileDocRepository extends JpaRepository<ManageFileDoc, String> {
     Optional<Object> findByFileId(String fileId);
+    List<ManageFileDoc> findAllByCreatedBy(String createdBy);
+
 
 }
 
