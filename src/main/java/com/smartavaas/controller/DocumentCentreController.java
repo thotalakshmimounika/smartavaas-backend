@@ -6,7 +6,8 @@ import com.smartavaas.dto.BaseApiResponse;
 import com.smartavaas.model.ManageFileDoc;
 import com.smartavaas.repository.ManageFileDocRepository;
 import com.smartavaas.service.DocumentCentreService;
-import org.hibernate.mapping.List;
+//import org.hibernate.mapping.List;
+import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
@@ -33,7 +34,7 @@ public class DocumentCentreController {
     @Autowired
     private ManageFileDocRepository manageFileDocRepository;
 
-    // ✅ Upload multiple files (max 10)
+    // Upload multiple files (max 10)
     @PostMapping("/uploadMultiple")
     public ResponseEntity<BaseApiResponse<String>> uploadMultipleFiles(
             @RequestParam("files") MultipartFile[] files,
@@ -48,18 +49,20 @@ public class DocumentCentreController {
         }
 
         try {
+            ArrayList<String> list_of_names = new ArrayList<>();
             for (MultipartFile file : files) {
                 documentService.uploadDocument(username, file, category);
+                list_of_names.add(file.getOriginalFilename());
             }
 
-            return ResponseEntity.ok(ApiResponseBuilder.success("Files uploaded successfully", "Files uploaded: " + files.length));
+            return ResponseEntity.ok(ApiResponseBuilder.success("Files uploaded successfully", "uploaded files names are : " + list_of_names));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
                     ApiResponseBuilder.error("Upload failed", HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage()));
         }
     }
 
-    // ✅ Download file by fileId
+    //  Download file by fileId
     @GetMapping("/download/{fileId}")
     public ResponseEntity<byte[]> downloadFile(@PathVariable String fileId) {
         try {
@@ -78,7 +81,7 @@ public class DocumentCentreController {
         }
     }
 
-    // ✅ View file inline by fileId (PDF, image, etc.)
+    //  View file inline by fileId (PDF, image, etc.)
     @GetMapping("/view/{fileId}")
     public ResponseEntity<byte[]> viewFile(@PathVariable String fileId) {
         try {
@@ -101,9 +104,9 @@ public class DocumentCentreController {
         }
     }
 
-    // ✅ Get all files uploaded by the logged-in user (uses entity directly)
+    // Get all files uploaded by the logged-in user (uses entity directly)
     @GetMapping("/myFiles")
-    public ResponseEntity<BaseApiResponse<List<ManageFileDoc>>> listUserFiles(Principal principal) {
+    public ResponseEntity<BaseApiResponse<?>> listUserFiles(Principal principal) {
         String username = principal.getName();
         try {
             List<ManageFileDoc> files = manageFileDocRepository.findAllByCreatedBy(username);
