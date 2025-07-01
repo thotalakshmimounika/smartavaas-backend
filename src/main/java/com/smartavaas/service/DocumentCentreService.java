@@ -49,13 +49,13 @@ public class DocumentCentreService {
                 });
 
 
-        String fileId = java.time.format.DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss")
+        String filetime = java.time.format.DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss")
                 .format(LocalDateTime.now());
 
-        fileId += UUID.randomUUID().toString();
+        String fileId = UUID.randomUUID().toString();
 
         String originalFileName = file.getOriginalFilename();
-        String storedFileName = fileId + "_" + originalFileName;
+        String storedFileName = filetime + "_" +  fileId +"_"+originalFileName;
 
         Path path = Paths.get(uploadDir).resolve(storedFileName);
         Files.createDirectories(path.getParent());
