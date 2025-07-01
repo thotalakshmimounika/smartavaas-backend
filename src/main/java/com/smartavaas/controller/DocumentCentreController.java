@@ -34,7 +34,7 @@ public class DocumentCentreController {
     @Autowired
     private ManageFileDocRepository manageFileDocRepository;
 
-    // ✅ Upload multiple files (max 10)
+    // Upload multiple files (max 10)
     @PostMapping("/uploadMultiple")
     public ResponseEntity<BaseApiResponse<String>> uploadMultipleFiles(
             @RequestParam("files") MultipartFile[] files,
@@ -62,7 +62,7 @@ public class DocumentCentreController {
         }
     }
 
-    // ✅ Download file by fileId
+    //  Download file by fileId
     @GetMapping("/download/{fileId}")
     public ResponseEntity<byte[]> downloadFile(@PathVariable String fileId) {
         try {
@@ -81,7 +81,7 @@ public class DocumentCentreController {
         }
     }
 
-    // ✅ View file inline by fileId (PDF, image, etc.)
+    //  View file inline by fileId (PDF, image, etc.)
     @GetMapping("/view/{fileId}")
     public ResponseEntity<byte[]> viewFile(@PathVariable String fileId) {
         try {
@@ -104,7 +104,7 @@ public class DocumentCentreController {
         }
     }
 
-    // ✅ Get all files uploaded by the logged-in user (uses entity directly)
+    // Get all files uploaded by the logged-in user (uses entity directly)
     @GetMapping("/myFiles")
     public ResponseEntity<BaseApiResponse<?>> listUserFiles(Principal principal) {
         String username = principal.getName();
