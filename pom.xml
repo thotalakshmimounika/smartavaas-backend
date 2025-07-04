@@ -69,6 +69,18 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
+        <!-- Thymeleaf -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+        <!--- OGNL : used by Thymeleaf -->
+        <dependency>
+            <groupId>ognl</groupId>
+            <artifactId>ognl</artifactId>
+            <version>3.2.21</version> <!-- or latest stable -->
+        </dependency>
+
         <!-- STRIPE  -->
         <dependency>
             <groupId>com.stripe</groupId>

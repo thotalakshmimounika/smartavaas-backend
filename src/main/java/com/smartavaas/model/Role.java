@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "roles")
+@Table(name = "ROLES")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,6 +20,19 @@ public class Role extends BaseEntity {
 
     public Role(RoleType name) {
         this.name = name;
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if(this == o) return true;
+        if( !(o instanceof Role)) return false;
+        Role role = (Role) o;
+        return name == role.name;
+    }
+
+    @Override
+    public int hashCode(){
+        return name != null ? name.hashCode() : 0;
     }
 }
 
