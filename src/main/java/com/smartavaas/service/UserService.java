@@ -9,13 +9,15 @@ import com.smartavaas.repository.RoleRepository;
 import com.smartavaas.repository.UserRepository;
 import com.smartavaas.exception.DuplicateEmailException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+
+import static com.smartavaas.enums.EmailTemplateKey.REGISTRATION_SUCCESS;
 
 @Service
 public class UserService {
@@ -50,9 +52,23 @@ public class UserService {
 
         userRepository.save(user);
 
-        emailService.sendVerificationCode(user.getEmail(), "Welcome to ResiAssist!");
+        //emailService.sendVerificationCode(user.getEmail(), "Welcome to ResiAssist!");
+        Map<String, Object> emailData = Map.of(
+                "name", user.getFirstname() // or whatever field you store
+        );
+        emailService.setMail(user.getEmail(),REGISTRATION_SUCCESS,emailData);
 
         return new RegisterResponse(user.getId(), user.getEmail(), "User registered successfully");
+    }
+
+    public void deleteUserById(Long userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            user.getRoles().clear(); // Remove associations from join table
+            userRepository.save(user); // Persist the disassociation
+            userRepository.delete(user); // Now safe to delete the user
+        }
     }
 
     public boolean authenticateUser(String email, String rawPassword) {
