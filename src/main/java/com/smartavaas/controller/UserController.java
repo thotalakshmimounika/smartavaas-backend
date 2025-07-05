@@ -13,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -25,6 +26,11 @@ public class UserController {
         RegisterResponse response = userService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponseBuilder.created("Registration successful", response));
+    }
+
+    @GetMapping("/userId/{userId}")
+    public ResponseEntity<BaseApiResponse<Optional<User>>> getUserById(@PathVariable Long userId){
+        return ResponseEntity.status((HttpStatus.FOUND)).body(ApiResponseBuilder.found("Found User Detail  ",userService.getUserById(userId)));
     }
 
     // Role-Guarded Endpoint

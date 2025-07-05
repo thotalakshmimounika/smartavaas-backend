@@ -2,6 +2,7 @@ package com.smartavaas.service;
 
 import com.smartavaas.dto.RegisterRequest;
 import com.smartavaas.dto.RegisterResponse;
+import com.smartavaas.exception.UserNotFoundException;
 import com.smartavaas.model.Role;
 import com.smartavaas.model.RoleType;
 import com.smartavaas.model.User;
@@ -59,6 +60,12 @@ public class UserService {
         emailService.setMail(user.getEmail(),REGISTRATION_SUCCESS,emailData);
 
         return new RegisterResponse(user.getId(), user.getEmail(), "User registered successfully");
+    }
+
+    public Optional<User> getUserById(Long userId){
+        return Optional.ofNullable(userRepository.findById(userId).orElseThrow(
+                () -> new UserNotFoundException("User not found with id: " + userId)
+        ));
     }
 
     public void deleteUserById(Long userId) {

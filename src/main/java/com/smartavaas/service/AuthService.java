@@ -53,8 +53,9 @@ public class AuthService {
         return new AuthResponse(
                 token,
                 user.getFirstname() + " " + user.getLastname(),
-                user.getRoles().toString(),
-                user.getId()
+                new String[] {user.getRoles().iterator().next().getName().toString()},
+                user.getId(),
+                user.getEmail()
         );
     }
 //    public void register(RegisterRequest request) {

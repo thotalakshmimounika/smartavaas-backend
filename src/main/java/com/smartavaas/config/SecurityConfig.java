@@ -47,12 +47,15 @@ public class SecurityConfig {
                                 "/auth/**",
                                 "/users/register",
                                 "/test/all",
-                                "/api/payment/callback",
+                                "/api/payment/callback"
+                        ).permitAll()
+                        .requestMatchers(
+                                "/api/payment/create-link/**",
+                                "/users/userId/**",
                                 "/api/getAnnouncement",
                                 "/api/createAnnouncement",
-                                "/api/documentCentre/upload"
-                        ).permitAll()
-                        .requestMatchers("/api/payment/create-link/**").authenticated()
+                                "/api/documentCentre/upload")
+                        .authenticated()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
