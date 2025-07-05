@@ -50,7 +50,12 @@ public class SecurityConfig {
                                 "/api/payment/callback",
                                 "/api/getAnnouncement",
                                 "/api/createAnnouncement",
-                                "/api/documentCentre/upload"
+                                "/api/documentCentre/upload",
+
+                                "/v3/api-docs/**",                  // ✅ Swagger OpenAPI JSON
+                                "/swagger-ui/**",                  // ✅ Swagger UI assets
+                                "/swagger-ui.html"
+
                         ).permitAll()
                         .requestMatchers("/api/payment/create-link/**").authenticated()
                         .anyRequest().authenticated()
