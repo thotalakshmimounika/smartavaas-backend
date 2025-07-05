@@ -47,4 +47,14 @@ public class ApiResponseBuilder {
                 .data(data)
                 .build();
     }
+
+    public static <T> BaseApiResponse<T> found(String message, T data) {
+        return BaseApiResponse.<T>builder()
+                .timestamp(LocalDateTime.now())
+                .statusCode(HttpStatus.FOUND.value())
+                .status("found")
+                .message(message)
+                .data(data)
+                .build();
+    }
 }
