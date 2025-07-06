@@ -48,16 +48,18 @@ public class SecurityConfig {
                                 "/users/register",
                                 "/test/all",
                                 "/api/payment/callback",
-                                "/api/getAnnouncement",
-                                "/api/createAnnouncement",
-                                "/api/documentCentre/upload",
 
                                 "/v3/api-docs/**",                  // ✅ Swagger OpenAPI JSON
                                 "/swagger-ui/**",                  // ✅ Swagger UI assets
                                 "/swagger-ui.html"
-
                         ).permitAll()
-                        .requestMatchers("/api/payment/create-link/**").authenticated()
+                        .requestMatchers(
+                                "/api/payment/create-link/**",
+                                "/users/userId/**",
+                                "/api/getAnnouncement",
+                                "/api/createAnnouncement",
+                                "/api/documentCentre/upload")
+                        .authenticated()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
