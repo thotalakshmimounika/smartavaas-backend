@@ -47,7 +47,11 @@ public class SecurityConfig {
                                 "/auth/**",
                                 "/users/register",
                                 "/test/all",
-                                "/api/payment/callback"
+                                "/api/payment/callback",
+
+                                "/v3/api-docs/**",                  // ✅ Swagger OpenAPI JSON
+                                "/swagger-ui/**",                  // ✅ Swagger UI assets
+                                "/swagger-ui.html"
                         ).permitAll()
                         .requestMatchers(
                                 "/api/payment/create-link/**",
