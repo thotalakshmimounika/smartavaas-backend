@@ -53,7 +53,7 @@ public class AuthService {
         return new AuthResponse(
                 token,
                 user.getFirstname() + " " + user.getLastname(),
-                new String[] {user.getRoles().iterator().next().getName().toString()},
+                user.getRoles().stream().iterator().next().getName().name(),
                 user.getId(),
                 user.getEmail()
         );
