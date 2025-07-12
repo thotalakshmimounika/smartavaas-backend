@@ -12,7 +12,7 @@ public class AuthResponse {
     @NotBlank
     private String fullname;
     @NotBlank
-    private String[] roles;
+    private String role;
     @NotBlank
     private Long userId;
     @NotBlank
