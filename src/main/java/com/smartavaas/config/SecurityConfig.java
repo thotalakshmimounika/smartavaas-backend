@@ -56,7 +56,6 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/payment/create-link/**",
                                 "/users/userId/**",
-                                "/api/getAnnouncement",
                                 "/api/createAnnouncement",
                                 "/api/documentCentre/upload")
                         .authenticated()
