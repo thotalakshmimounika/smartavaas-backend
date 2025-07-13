@@ -17,7 +17,9 @@ public class WebConfig implements WebMvcConfigurer {
                         "http://3.231.160.198","https://dev.resiassist.com",
                         "capacitor://localhost", // for Capacitor
                         "ionic://localhost",     // for Ionic apps
-                        "http://localhost"       // general localhost fallback)
+                        "http://localhost"  ,     // general localhost fallback)
+                    "https://www.resiassist.com",
+                    "https://resiassist.com"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
