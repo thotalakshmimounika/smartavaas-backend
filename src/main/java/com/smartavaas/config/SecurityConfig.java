@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -44,14 +45,20 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                HttpMethod.OPTIONS, "/**"  //  Add this line to allow OPTIONS preflight
+                        ).permitAll()
+                        .requestMatchers(
                                 "/auth/**",
                                 "/users/register",
                                 "/test/all",
                                 "/api/payment/callback",
-                                "/api/getAnnouncement",
-                                "/api/createAnnouncement"
+                                "/v3/api-docs/**",                  //  Swagger OpenAPI JSON
+                                "/swagger-ui/**",                  //  Swagger UI assets
+                                "/swagger-ui.html"
                         ).permitAll()
-                        .requestMatchers("/api/payment/create-link/**").authenticated()
+                        .requestMatchers(
+                                "/api/payment/create-link/**")
+                        .authenticated()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

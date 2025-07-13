@@ -15,4 +15,6 @@ public class AuthResponse {
     private String role;
     @NotBlank
     private Long userId;
+    @NotBlank
+    private String emailId;
 }
